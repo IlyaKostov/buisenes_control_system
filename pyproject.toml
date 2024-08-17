@@ -8,8 +8,53 @@ packages = [{include = "business_management_system"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+fastapi = {extras = ["all"], version = "^0.112.1"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.32"}
+pydantic = "^2.8.2"
+pydantic-settings = "^2.4.0"
+asyncpg = "^0.29.0"
+alembic = "^1.13.2"
+pyjwt = {extras = ["crypto"], version = "^2.9.0"}
+ruff = "^0.6.1"
+loguru = "^0.7.2"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 120
+exclude = ["alembic/*", "tests/*"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["ALL"]
+extend-select = ["W", "E"]
+preview = true
+ignore = [
+    "ANN401", # any-type
+    "B008", # function-call-in-default-argument
+    "B904", # raise-without-from-inside-except
+    "BLE001", # blind-except
+    "CPY001", # missing-copyright-notice
+    "D100", # undocumented-public-module
+#    "D101", # undocumented-public-class
+#    "D102", # undocumented-public-method
+#    "D103", # undocumented-public-function
+#    "D104", # undocumented-public-package
+#    "D105", # undocumented-magic-method
+    "D107", # undocumented-public-init
+    "D203", # one-blank-line-before-class
+    "D213", # multi-line-summary-second-line
+    "DOC501", # docstring-missing-exception
+    "FAST002", # fast-api-non-annotated-dependency
+    "INP001", # implicit-namespace-package
+    "RUF009", # function-call-in-dataclass-default-argument
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.pylint]
+max-args = 7
