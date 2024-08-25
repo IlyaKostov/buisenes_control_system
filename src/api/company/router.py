@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from src.api.account.service import AccountService
 from src.api.company.service import CompanyService
-from src.schemas.account import CheckAccountResponse, CreateAccount, CreateAccountResponse, ConfirmAccount, \
+from src.schemas.account import CheckAccountResponse, CreateAccountResponse, ConfirmAccount, \
     SignUpCompleteRequest
 from src.schemas.company import CreateCompanyResponse, CompanyDB
 
@@ -16,7 +16,7 @@ async def sign_up(
 ):
     response_message: CreateAccountResponse = await account_service.check_account_invite(confirm_account)
 
-    return CreateAccountResponse(payload=response_message)
+    return CheckAccountResponse(payload=response_message)
 
 
 @router.post("/sign-up-complete")
