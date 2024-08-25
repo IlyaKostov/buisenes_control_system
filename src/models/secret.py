@@ -15,7 +15,7 @@ class SecretModel(BaseModel):
     __tablename__ = 'secret'
 
     id: Mapped[uuid_pk]
-    password: Mapped[str]
+    password: Mapped[bytes]
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 

@@ -26,7 +26,7 @@ class UserModel(CompanyMixin, BaseModel):
 
     account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
 
-    account: Mapped['AccountModel'] = relationship(back_populates='user', cascade="all, delete-orphan")
+    account: Mapped['AccountModel'] = relationship(back_populates='user')
 
     __table_args__ = (UniqueConstraint('account_id'),)
 

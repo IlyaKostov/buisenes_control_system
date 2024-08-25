@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING
 
-from pydantic import EmailStr
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models import BaseModel
+from src.schemas.account import AccountDB
 from src.utils.custom_types import integer_pk, created_at, updated_at
 
 if TYPE_CHECKING:
@@ -21,6 +21,9 @@ class AccountModel(BaseModel):
     created_at: Mapped[created_at]
     updated_at: Mapped[updated_at]
 
-    user: Mapped['UserModel'] = relationship(back_populates='account')
-    invite: Mapped['InviteModel'] = relationship(back_populates='account')
-    secret: Mapped['SecretModel'] = relationship(back_populates='account')
+    user: Mapped['UserModel'] = relationship(back_populates='account', cascade="all, delete-orphan")
+    invite: Mapped['InviteModel'] = relationship(back_populates='account', cascade="all, delete-orphan")
+    secret: Mapped['SecretModel'] = relationship(back_populates='account', cascade="all, delete-orphan")
+
+    def to_pydantic_schema(self) -> AccountDB:
+        return AccountDB(**self.__dict__)

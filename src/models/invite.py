@@ -17,6 +17,6 @@ class InviteModel(BaseModel):
     account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
     token: Mapped[str] = mapped_column(String(30))
 
-    account: Mapped['AccountModel'] = relationship(back_populates='user', cascade="all, delete-orphan")
+    account: Mapped['AccountModel'] = relationship(back_populates='invite')
 
     __table_args__ = (UniqueConstraint('account_id'),)
