@@ -17,6 +17,10 @@ alembic = "^1.13.2"
 pyjwt = {extras = ["crypto"], version = "^2.9.0"}
 ruff = "^0.6.1"
 loguru = "^0.7.2"
+bcrypt = "^4.2.0"
+email-validator = "^2.2.0"
+python-multipart = "^0.0.9"
+aiosmtplib = "^3.0.2"
 
 
 [build-system]
@@ -39,11 +43,11 @@ ignore = [
     "BLE001", # blind-except
     "CPY001", # missing-copyright-notice
     "D100", # undocumented-public-module
-#    "D101", # undocumented-public-class
-#    "D102", # undocumented-public-method
-#    "D103", # undocumented-public-function
-#    "D104", # undocumented-public-package
-#    "D105", # undocumented-magic-method
+    "D101", # undocumented-public-class
+    "D102", # undocumented-public-method
+    "D103", # undocumented-public-function
+    "D104", # undocumented-public-package
+    "D105", # undocumented-magic-method
     "D107", # undocumented-public-init
     "D203", # one-blank-line-before-class
     "D213", # multi-line-summary-second-line
