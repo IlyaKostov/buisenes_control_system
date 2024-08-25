@@ -32,6 +32,10 @@ class CheckAccountResponse(BaseResponse):
     payload: CreateAccountResponse
 
 
+class UpdateAccountResponse(BaseResponse):
+    payload: AccountDB
+
+
 class ConfirmAccount(CreateAccount, CheckInvite):
     pass
 

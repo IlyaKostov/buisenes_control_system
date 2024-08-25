@@ -11,7 +11,7 @@ class CreateSecretRequest(BaseModel):
 
 
 class Secret(BaseModel):
-    password: bytes
+    password: str
 
 
 class UpdateSecretRequest(CreateSecretRequest):
