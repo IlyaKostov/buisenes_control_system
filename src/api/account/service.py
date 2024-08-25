@@ -1,10 +1,12 @@
-import random
-import string
-
+from pydantic import EmailStr
 from starlette import status
 from starlette.exceptions import HTTPException
 
-from src.schemas.account import CreateAccount, CreateAccountResponse, ConfirmAccount
+from src.api.invite.service import InviteService
+from src.models import AccountModel
+from src.schemas.account import CreateAccountResponse, ConfirmAccount
+from src.schemas.auth import AuthRequestSchema
+from src.utils.auth.password import hash_password
 from src.utils.base_service import BaseService
 from src.utils.unit_of_work import transaction_mode
 
@@ -13,26 +15,65 @@ class AccountService(BaseService):
     base_repository = 'account'
 
     @transaction_mode
-    async def check_and_create_account(self, check_account: CreateAccount) -> CreateAccountResponse:
-        account = await self.uow.account.get_account_by_email(check_account.email)
-        if account.user:
+    async def check_and_create_account(self, email: EmailStr) -> CreateAccountResponse:
+        account: AccountModel = await self.uow.account.get_account_by_email(email)
+        invite_service = InviteService()
+
+        if account and account.user:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already in use")
 
-        new_account = self.uow.account.add_one_and_get_obj(email=check_account.email)
-        invite_token = self.generate_invite()
-        invite = self.uow.invite.add_one_and_get_obj(invite_token=invite_token)
+        if account is None:
+            account = await self.uow.account.add_one_and_get_obj(email=email)
+            await self.uow.commit()
+            invite = await invite_service.create_invite(account)
+            account.invite = invite
+        else:
+            await invite_service.update_invite(account)
 
-        new_account.invite = invite
+        return CreateAccountResponse(message="Email is available, Invite link sent")
 
-        return CreateAccountResponse(message="Email is available, Invite code sent")
+    # @transaction_mode
+    # async def create_account(self, email: EmailStr) -> AccountModel:
+    #     existing_account: AccountModel = await self.uow.account.get_account_by_email(email)
+    #     if existing_account and existing_account.user:
+    #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email уже используется")
+    #
+    #
+    #     account: AccountModel = await self.uow.account.add_one_and_get_obj(email=email)
+    #     return account
 
     @transaction_mode
     async def check_account_invite(self, confirm_account: ConfirmAccount) -> CreateAccountResponse:
         account = await self.uow.account.get_account_by_email(confirm_account.email)
-        if account.invite.token != confirm_account.token:
+
+        if account is None or not account.invite or account.invite.token != confirm_account.token:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid account or invite token.")
+
         return CreateAccountResponse(message="Email confirmed.")
 
-    @staticmethod
-    async def generate_invite(length=5):
-        return ''.join(random.choices(string.digits, k=length))
+    @transaction_mode
+    async def confirm_account(self, confirm_data: AuthRequestSchema):
+        account = await self.uow.account.get_account_by_email(confirm_data.email)
+        if account is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid account")
+
+        hashed_password = hash_password(confirm_data.password)
+
+        secret = await self.uow.secret.add_one_and_get_obj(password=hashed_password, account_id=account.id)
+        account.secret = secret
+        return CreateAccountResponse(message="Email confirmed and set password")
+
+    @transaction_mode
+    async def change_email(self, email: EmailStr, account_data: AccountModel) -> AccountModel:
+        account: AccountModel = await self.uow.account.get_account_by_email(email)
+
+        if account:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already in use")
+
+        updated_data: dict[str, str] = {
+            "email": email
+        }
+
+        updated_account: AccountModel = await self.uow.account.update_one_by_id(account_data.id, updated_data)
+
+        return updated_account
