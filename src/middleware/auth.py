@@ -4,11 +4,13 @@ from starlette import status
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 
+from src.models import AccountModel
 from src.utils.auth.jwt import decode_jwt
 from src.utils.unit_of_work import UnitOfWork
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/sign-in", auto_error=False)
 
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -18,19 +20,20 @@ class AuthMiddleware(BaseHTTPMiddleware):
         self.excluded_routes = excluded_routes or []
 
     async def dispatch(self, request: Request, call_next):
-        if request.url.path in self.excluded_routes:
+        if any(request.url.path.startswith(routes) for routes in self.excluded_routes):
             return await call_next(request)
 
-        token = await oauth2_scheme(request)
-        if not token:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Authorization header missing")
-
         try:
+            token: str = await oauth2_scheme(request)
+
+            if not token:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Authorization header missing")
+
             payload = decode_jwt(token=token)
             account_id = payload.get("sub")
 
-            async with self.uow as uow:
-                account = await uow.account.get_by_query_one_or_none(id=account_id)
+            async with self.uow:
+                account: AccountModel = await self.uow.account.get_account_by_id(_id=account_id)
                 if not account:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -41,7 +44,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
                         status_code=status.HTTP_403_FORBIDDEN,
                         detail="User inactive",
                     )
-                request.state.account = account
+
+            request.state.account = account
 
         except ExpiredSignatureError:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token has expired")
@@ -49,6 +53,10 @@ class AuthMiddleware(BaseHTTPMiddleware):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"invalid token error: {e}",
+            )
+        except HTTPException as http_exc:
+            return JSONResponse(
+                status_code=http_exc.status_code, content={"detail": http_exc.detail}
             )
 
         response = await call_next(request)
