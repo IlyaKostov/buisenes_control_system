@@ -14,6 +14,9 @@ class BaseService:
 
     base_repository: str = None
 
+    def __init__(self) -> None:
+        self.uow: UnitOfWork = UnitOfWork()
+
     @classmethod
     async def add_one(cls, uow: UnitOfWork, **kwargs) -> None:
         async with uow:
