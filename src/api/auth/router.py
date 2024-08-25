@@ -10,10 +10,10 @@ from src.schemas.auth import AuthRequestSchema, TokenInfoSchema, AuthResponseSch
 router = APIRouter()
 
 
-@router.post('/sign-in', response_model=AuthResponseSchema)
+@router.post('/sign-in', response_model=TokenInfoSchema)
 async def auth_user_issue_jwt(
     auth_request: AuthRequestSchema = Depends(AuthService().validate_auth_user),
-    sign_in_service: AuthService = Depends(AuthService)
-) -> AuthResponseSchema:
+    sign_in_service: AuthService = Depends()
+) -> TokenInfoSchema:
     token_info: TokenInfoSchema = await sign_in_service.sign_in(auth_request)
     return AuthResponseSchema(payload=token_info)

@@ -1,5 +1,6 @@
 from datetime import datetime, UTC
 
+from fastapi import Form
 from starlette import status
 from starlette.exceptions import HTTPException
 
@@ -13,11 +14,10 @@ from src.utils.unit_of_work import transaction_mode
 class AuthService(BaseService):
 
     async def sign_in(self, auth_request: AuthRequestSchema) -> TokenInfoSchema:
-        account = await self.validate_auth_user(auth_request)
         current_time = datetime.now(UTC)
         jwt_payload = {
-            "sub": account.id,
-            "email": account.email,
+            "sub": auth_request.id,
+            "email": auth_request.email,
             "logged_in_at": current_time.timestamp()
         }
         token = encode_jwt(jwt_payload)
@@ -27,18 +27,22 @@ class AuthService(BaseService):
         )
 
     @transaction_mode
-    async def validate_auth_user(self, auth_request: AuthRequestSchema):
+    async def validate_auth_user(
+            self,
+            username: str = Form(),
+            password: str = Form(),
+    ):
         unauthed_exc = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="invalid email or password",
         )
 
-        account = await self.uow.account.get_account_by_email(email=auth_request.email)
+        account = await self.uow.account.get_account_by_email(email=username)
         if not account:
             raise unauthed_exc
 
         if not validate_password(
-                password=auth_request.password,
+                password=password,
                 hashed_password=account.secret.password,
         ):
             raise unauthed_exc
