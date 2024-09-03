@@ -9,7 +9,7 @@ from src.schemas.user import UserDB
 from src.utils.custom_types import created_at, updated_at, uuid_pk
 
 if TYPE_CHECKING:
-    from src.models.account import AccountModel
+    from src.models import AccountModel, PositionModel
 
 
 class UserModel(CompanyMixin, BaseModel):
@@ -27,6 +27,7 @@ class UserModel(CompanyMixin, BaseModel):
     account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
 
     account: Mapped['AccountModel'] = relationship(back_populates='user')
+    positions: Mapped[list['PositionModel']] = relationship(secondary="user_position", back_populates='users')
 
     __table_args__ = (UniqueConstraint('account_id'),)
 
