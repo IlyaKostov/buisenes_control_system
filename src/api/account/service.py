@@ -1,3 +1,4 @@
+from fastapi import Depends, BackgroundTasks
 from pydantic import EmailStr
 from starlette import status
 from starlette.exceptions import HTTPException
@@ -15,7 +16,7 @@ class AccountService(BaseService):
     base_repository = 'account'
 
     @transaction_mode
-    async def check_and_create_account(self, email: EmailStr) -> CreateAccountResponse:
+    async def check_and_create_account(self, email: EmailStr, background_tasks: BackgroundTasks) -> CreateAccountResponse:
         account: AccountModel = await self.uow.account.get_account_by_email(email)
         invite_service = InviteService()
 
@@ -25,22 +26,15 @@ class AccountService(BaseService):
         if account is None:
             account = await self.uow.account.add_one_and_get_obj(email=email)
             await self.uow.commit()
-            invite = await invite_service.create_invite(account)
+            invite = await invite_service.create_invite(account, background_tasks)
             account.invite = invite
+        elif account and account.invite:
+            await invite_service.update_invite(account, background_tasks)
         else:
-            await invite_service.update_invite(account)
+            invite = await invite_service.create_invite(account, background_tasks)
+            account.invite = invite
 
         return CreateAccountResponse(message="Email is available, Invite link sent")
-
-    # @transaction_mode
-    # async def create_account(self, email: EmailStr) -> AccountModel:
-    #     existing_account: AccountModel = await self.uow.account.get_account_by_email(email)
-    #     if existing_account and existing_account.user:
-    #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email уже используется")
-    #
-    #
-    #     account: AccountModel = await self.uow.account.add_one_and_get_obj(email=email)
-    #     return account
 
     @transaction_mode
     async def check_account_invite(self, confirm_account: ConfirmAccount) -> CreateAccountResponse:
