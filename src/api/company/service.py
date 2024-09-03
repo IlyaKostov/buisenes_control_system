@@ -1,3 +1,6 @@
+from starlette import status
+from starlette.exceptions import HTTPException
+
 from src.schemas.account import SignUpCompleteRequest
 from src.schemas.company import CompanyDB
 from src.utils.auth.password import hash_password
@@ -12,6 +15,9 @@ class CompanyService(BaseService):
     async def create_company(self, complete_data: SignUpCompleteRequest) -> CompanyDB:
 
         account = await self.uow.account.get_account_by_email(complete_data.email)
+
+        if account is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong email address")
 
         new_company = await self.uow.company.add_one_and_get_obj(
             inn=complete_data.inn,
