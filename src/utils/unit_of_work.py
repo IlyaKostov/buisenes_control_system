@@ -12,11 +12,23 @@ from src.repositories import (
     SecretRepository,
     InviteRepository
 )
+from src.repositories.position import PositionRepository
+from src.repositories.struct_adm import StructAdmRepository
+from src.repositories.struct_adm_positions import StructAdmPositionRepository
+from src.repositories.task import TaskRepository
 from src.utils.custom_types import async_func
 
 
 class AbstractUnitOfWork(ABC):
-    spimex_trading_results: SpimexTradingResultsRepository
+    user: UserRepository
+    account: AccountRepository
+    invite: InviteRepository
+    company: CompanyRepository
+    secret: SecretRepository
+    task: TaskRepository
+    position: PositionRepository
+    struct_adm: StructAdmRepository
+    struct_adm_position: StructAdmPositionRepository
 
     @abstractmethod
     def __init__(self):
@@ -47,7 +59,15 @@ class UnitOfWork(AbstractUnitOfWork):
 
     async def __aenter__(self) -> None:
         self.session = self.session_factory()
-        self.spimex_trading_results = SpimexTradingResultsRepository(self.session)
+        self.user = UserRepository(self.session)
+        self.account = AccountRepository(self.session)
+        self.invite = InviteRepository(self.session)
+        self.company = CompanyRepository(self.session)
+        self.secret = SecretRepository(self.session)
+        self.task = TaskRepository(self.session)
+        self.position = PositionRepository(self.session)
+        self.struct_adm = StructAdmRepository(self.session)
+        self.struct_adm_position = StructAdmPositionRepository(self.session)
 
     async def __aexit__(
             self,
