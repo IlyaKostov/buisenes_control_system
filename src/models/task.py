@@ -7,6 +7,7 @@ from sqlalchemy import Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models import BaseModel
+from src.schemas.task import TaskDB
 from src.utils.custom_types import uuid_pk
 
 if TYPE_CHECKING:
@@ -45,3 +46,17 @@ class TaskModel(BaseModel):
 
     observers: Mapped[list['UserModel']] = relationship(secondary='task_observers')
     assignees: Mapped[list['UserModel']] = relationship(secondary='task_assignees')
+
+    def to_pydantic_schema(self):
+        return TaskDB(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            author_id=self.author_id,
+            responsible_id=self.responsible_id,
+            deadline=self.deadline,
+            status=self.status,
+            time_estimate=self.time_estimate,
+            observers=[observer.to_pydantic_schema() for observer in self.observers],
+            assignees=[assignee.to_pydantic_schema() for assignee in self.assignees],
+        )
