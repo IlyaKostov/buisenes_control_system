@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
 from src.api import router
-from src.metadata import DESCRIPTION, TAG_METADATA, TITLE, VERSION
+from src.metadata import DESCRIPTION, TITLE, VERSION
 from src.middleware.auth import AuthMiddleware
 from src.utils.unit_of_work import UnitOfWork
 
@@ -16,8 +16,9 @@ def create_fast_api_app() -> FastAPI:
 
     excluded_paths = [
         "/api/account/check_account",
-        "/api/auth/sign-up",
-        "/api/auth/sign-up-complete",
+        "/api/company/sign-up",
+        "/api/company/sign-up-complete",
+        "/api/account/confirm-account",
         "/api/auth/sign-in",
         "/docs",
         "/redoc",
