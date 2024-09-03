@@ -4,6 +4,7 @@ from src.models import BaseModel
 
 from typing import TYPE_CHECKING
 
+from src.schemas.position import PositionDB
 from src.utils.custom_types import uuid_pk
 
 if TYPE_CHECKING:
@@ -23,3 +24,6 @@ class PositionModel(BaseModel):
     structs_adm: Mapped[list["StructAdmModel"]] = relationship(
         secondary="struct_adm_position", back_populates="positions"
     )
+
+    def to_pydantic_schema(self):
+        return PositionDB(**self.__dict__)
