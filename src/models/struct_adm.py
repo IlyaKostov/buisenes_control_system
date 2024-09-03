@@ -24,7 +24,7 @@ class StructAdmModel(CompanyMixin, BaseModel):
     id: Mapped[integer_pk]
     name: Mapped[str] = mapped_column(String(50))
     path: Mapped[Any] = mapped_column(LtreeType)
-    parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey('struct_adm.id'))
+    parent_id: Mapped[Optional[int]] = mapped_column(ForeignKey('struct_adm.id', ondelete='CASCADE'))
     manager_id: Mapped[Optional[uuid4]] = mapped_column(ForeignKey('user.id', ondelete="CASCADE"))
 
     parent: Mapped["StructAdmModel"] = relationship(
