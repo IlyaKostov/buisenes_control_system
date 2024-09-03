@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     REDIS_DB: int
 
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    SMTP_HOST: str
+    SMTP_PORT: int
+
     auth_jwt: AuthJWT = AuthJWT()
 
     naming_convention: dict[str, str] = {
