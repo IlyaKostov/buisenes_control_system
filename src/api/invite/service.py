@@ -36,4 +36,3 @@ class InviteService(BaseService):
     @staticmethod
     async def generate_invite(length: int = 5) -> str:
         return ''.join(random.choices(string.digits, k=length))
-

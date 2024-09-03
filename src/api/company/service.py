@@ -17,7 +17,7 @@ class CompanyService(BaseService):
         account = await self.uow.account.get_account_by_email(complete_data.email)
 
         if account is None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong email address")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Wrong email address')
 
         new_company = await self.uow.company.add_one_and_get_obj(
             inn=complete_data.inn,
@@ -29,7 +29,7 @@ class CompanyService(BaseService):
             last_name=complete_data.last_name,
             middle_name=complete_data.middle_name,
             account_id=account.id,
-            company_id=new_company.id
+            company_id=new_company.id,
         )
 
         hashed_password = hash_password(complete_data.password)
@@ -44,5 +44,5 @@ class CompanyService(BaseService):
             id=new_company.id,
             inn=new_company.inn,
             company_name=new_company.company_name,
-            is_active=True
+            is_active=True,
         )

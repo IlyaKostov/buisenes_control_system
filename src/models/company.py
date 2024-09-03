@@ -8,7 +8,7 @@ from src.schemas.company import CompanyDB
 from src.utils.custom_types import created_at, updated_at, uuid_pk
 
 if TYPE_CHECKING:
-    from src.models import UserModel, StructAdmModel
+    from src.models import StructAdmModel, UserModel
 
 
 class CompanyModel(BaseModel):

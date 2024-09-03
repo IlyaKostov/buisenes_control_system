@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends
 from pydantic import EmailStr
 from starlette import status
 from starlette.exceptions import HTTPException
 
-from src.api.dependencies import CurrentAccount
 from src.api.account.service import AccountService
+from src.api.dependencies import CurrentAccount
 from src.models import AccountModel
 from src.schemas.account import CheckAccountResponse, CreateAccountResponse, UpdateAccountResponse
 from src.schemas.auth import AuthRequestSchema
@@ -12,7 +12,7 @@ from src.schemas.auth import AuthRequestSchema
 router = APIRouter()
 
 
-@router.get("/check_account/{account}")
+@router.get('/check_account/{account}')
 async def check_and_create_account(
     account: EmailStr,
     background_tasks: BackgroundTasks,
@@ -23,7 +23,7 @@ async def check_and_create_account(
     return CheckAccountResponse(payload=response_message)
 
 
-@router.post("/create-account")
+@router.post('/create-account')
 async def create_account(
     account: CurrentAccount,
     email: EmailStr,
@@ -38,7 +38,7 @@ async def create_account(
     return CheckAccountResponse(payload=response_message)
 
 
-@router.post("/confirm-account")
+@router.post('/confirm-account')
 async def confirm_account(
     confirmed_data: AuthRequestSchema,
     account_service: AccountService = Depends(),
@@ -49,7 +49,7 @@ async def confirm_account(
     return CheckAccountResponse(payload=response_message)
 
 
-@router.put("/change-email")
+@router.put('/change-email')
 async def change_email(
     account: CurrentAccount,
     email: EmailStr,

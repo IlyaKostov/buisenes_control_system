@@ -1,12 +1,12 @@
-from typing import Optional, Union, Any, Sequence
-from uuid import uuid4, UUID
+from collections.abc import Sequence
+from typing import Any
+from uuid import UUID
 
 from src.utils.unit_of_work import UnitOfWork, transaction_mode
 
 
 class BaseService:
-    """
-    A basic service for performing standard CRUD operations with the base repository.
+    """A basic service for performing standard CRUD operations with the base repository.
 
     params:
         - base_repository: should be string like AbstractUnitOfWork class params
@@ -48,4 +48,3 @@ class BaseService:
     @transaction_mode
     async def delete_all(self) -> None:
         await self.uow.__dict__[self.base_repository].delete_all()
-

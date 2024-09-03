@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Annotated, Any
 from uuid import uuid4
 
-from sqlalchemy import UUID, DateTime, Integer, text, Sequence
+from sqlalchemy import UUID, DateTime, Integer, Sequence, text
 from sqlalchemy.orm import mapped_column
 
 async_func = Callable[..., Awaitable[Any]]

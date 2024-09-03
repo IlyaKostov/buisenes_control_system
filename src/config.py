@@ -2,7 +2,7 @@ from pathlib import Path
 
 from dotenv import find_dotenv, load_dotenv
 from pydantic import BaseModel
-from pydantic_settings import SettingsConfigDict, BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv(find_dotenv('.env'))
 
@@ -10,9 +10,9 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class AuthJWT(BaseModel):
-    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
-    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
-    algorithm: str = "RS256"
+    private_key_path: Path = BASE_DIR / 'certs' / 'jwt-private.pem'
+    public_key_path: Path = BASE_DIR / 'certs' / 'jwt-public.pem'
+    algorithm: str = 'RS256'
     access_token_expire_minutes: int = 1440
 
 
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
 
     @property
     def DB_URL(self) -> str:
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f'postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}'
 
     @property
     def REDIS_URL(self) -> str:

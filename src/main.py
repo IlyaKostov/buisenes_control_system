@@ -15,14 +15,14 @@ def create_fast_api_app() -> FastAPI:
     env_name = os.getenv('MODE', 'DEV')
 
     excluded_paths = [
-        "/api/account/check_account",
-        "/api/company/sign-up",
-        "/api/company/sign-up-complete",
-        "/api/account/confirm-account",
-        "/api/auth/sign-in",
-        "/docs",
-        "/redoc",
-        "/openapi.json"
+        '/api/account/check_account',
+        '/api/company/sign-up',
+        '/api/company/sign-up-complete',
+        '/api/account/confirm-account',
+        '/api/auth/sign-in',
+        '/docs',
+        '/redoc',
+        '/openapi.json',
     ]
 
     if env_name != 'PROD':

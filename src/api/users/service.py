@@ -9,25 +9,25 @@ from src.utils.unit_of_work import transaction_mode
 
 
 class UserService(BaseService):
-    base_repository = "user"
+    base_repository = 'user'
 
     @transaction_mode
     async def create_user(
             self,
             email: EmailStr,
             request_user: CreateUserRequest,
-            admin_account: AccountModel
+            admin_account: AccountModel,
     ) -> UserModel:
         account: AccountModel = await self.uow.account.get_account_by_email(email)
         if account is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid email')
 
         new_user: UserModel = await self.uow.user.add_one_and_get_obj(
             first_name=request_user.first_name,
             last_name=request_user.last_name,
             middle_name=request_user.middle_name,
             account_id=account.id,
-            company_id=admin_account.user.company_id
+            company_id=admin_account.user.company_id,
         )
         account.user = new_user
         return new_user
@@ -42,13 +42,13 @@ class UserService(BaseService):
         updates: dict[str, str] = {
             'first_name': request_user.first_name,
             'last_name': request_user.last_name,
-            'middle_name': request_user.middle_name
+            'middle_name': request_user.middle_name,
         }
 
         updates = {k: v for k, v in updates.items() if v is not None}
 
         if not updates:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No fields to update")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='No fields to update')
 
         updated_user: UserModel = await self.uow.user.update_one_by_id(account.user.id, values=updates)
 

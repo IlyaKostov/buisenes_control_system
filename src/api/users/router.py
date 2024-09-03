@@ -15,7 +15,7 @@ from src.schemas.user import (
 router = APIRouter()
 
 
-@router.post("/create-user")
+@router.post('/create-user')
 async def create_user(
         account: CurrentAccount,
         email: EmailStr,
@@ -31,7 +31,7 @@ async def create_user(
     return CreateUserResponse(payload=user.to_pydantic_schema())
 
 
-@router.put("/update-user")
+@router.put('/update-user')
 async def update_account(
         account: CurrentAccount,
         request_user: UpdateUserRequest,

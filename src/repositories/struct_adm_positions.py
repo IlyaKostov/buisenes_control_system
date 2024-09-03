@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select, Result
+from sqlalchemy import Result, select
 
 from src.models import StructAdmPositionModel
 from src.utils.repository import SQLAlchemyRepository

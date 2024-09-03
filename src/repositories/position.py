@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import select, Result
+from sqlalchemy import Result, select
 from sqlalchemy.orm import selectinload
 
 from src.models import PositionModel

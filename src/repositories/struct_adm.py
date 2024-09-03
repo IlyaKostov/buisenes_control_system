@@ -1,4 +1,4 @@
-from sqlalchemy import select, text, Result
+from sqlalchemy import Result, select, text
 from sqlalchemy.orm import selectinload
 from sqlalchemy_utils import Ltree
 
@@ -33,13 +33,13 @@ class StructAdmRepository(SQLAlchemyRepository):
             UPDATE struct_adm
             SET path = :new_path || subpath(path, nlevel(:old_path))
             WHERE path <@ :old_path AND id != :department_id;
-            """
+            """,
         )
 
         params = {
-                "new_path": str(new_path),
-                "old_path": str(old_path),
-                'department_id': department_id
+                'new_path': str(new_path),
+                'old_path': str(old_path),
+                'department_id': department_id,
             }
 
         await self.session.execute(query, params)

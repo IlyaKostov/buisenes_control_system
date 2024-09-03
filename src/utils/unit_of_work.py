@@ -6,11 +6,11 @@ from typing import Any
 from src.database.db import async_session_maker
 
 from src.repositories import (
-    CompanyRepository,
-    UserRepository,
     AccountRepository,
+    CompanyRepository,
+    InviteRepository,
     SecretRepository,
-    InviteRepository
+    UserRepository,
 )
 from src.repositories.position import PositionRepository
 from src.repositories.struct_adm import StructAdmRepository

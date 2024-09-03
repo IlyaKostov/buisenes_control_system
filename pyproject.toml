@@ -50,11 +50,13 @@ ignore = [
     "D104", # undocumented-public-package
     "D105", # undocumented-magic-method
     "D107", # undocumented-public-init
+    "DOC201",
     "D203", # one-blank-line-before-class
     "D213", # multi-line-summary-second-line
     "DOC501", # docstring-missing-exception
     "FAST002", # fast-api-non-annotated-dependency
     "INP001", # implicit-namespace-package
+    "TCH001",
     "RUF009", # function-call-in-dataclass-default-argument
 ]
 

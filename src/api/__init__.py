@@ -13,9 +13,9 @@ from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from src.api.account.router import router as account_router
 from src.api.auth.router import router as auth_router
 from src.api.company.router import router as company_router
-from src.api.users.router import router as users_router
-from src.api.struct_adm.router import router as department_router
 from src.api.positions.router import router as position_router
+from src.api.struct_adm.router import router as department_router
+from src.api.users.router import router as users_router
 from src.database.db import get_async_session
 from src.metadata import ERRORS_MAP
 from src.schemas.response import BaseResponse

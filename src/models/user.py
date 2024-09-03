@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models import BaseModel
@@ -27,7 +27,7 @@ class UserModel(CompanyMixin, BaseModel):
     account_id: Mapped[int] = mapped_column(ForeignKey('account.id'))
 
     account: Mapped['AccountModel'] = relationship(back_populates='user')
-    positions: Mapped[list['PositionModel']] = relationship(secondary="user_position", back_populates='users')
+    positions: Mapped[list['PositionModel']] = relationship(secondary='user_position', back_populates='users')
 
     __table_args__ = (UniqueConstraint('account_id'),)
 

@@ -3,7 +3,7 @@ import uuid
 from starlette import status
 from starlette.exceptions import HTTPException
 
-from src.models import AccountModel, PositionModel, UserModel, StructAdmModel
+from src.models import AccountModel, PositionModel, StructAdmModel, UserModel
 from src.schemas.position import CreatePosition, UpdatePosition
 from src.utils.base_service import BaseService
 from src.utils.unit_of_work import transaction_mode
@@ -22,21 +22,23 @@ class PositionService(BaseService):
         try:
             uuid_obj = uuid.UUID(position_id)
         except ValueError:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid UUID format")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Invalid UUID format')
 
         position = await self.uow.position.get_by_query_one_or_none(id=position_id)
         if position is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Position not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Position not found')
 
-        updated_position = await self.uow.position.update_one_by_id(position_id, {'name': data.name})
+        updated_position: PositionModel | None = (
+            await self.uow.position.update_one_by_id(position_id, {'name': data.name})
+        )
         return updated_position
 
     @transaction_mode
-    async def delete_position(self, position_id: uuid.UUID):
+    async def delete_position(self, position_id: uuid.UUID) -> None:
         position = self.uow.position.get_by_query_one_or_none(id=position_id)
 
         if position is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Position not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Position not found')
 
         await self.uow.position.delete_by_query(id=position_id)
 
@@ -46,7 +48,7 @@ class PositionService(BaseService):
         position: PositionModel = await self.uow.position.get_position_with_users(position_id)
 
         if user is None or position is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User or Position not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User or Position not found')
 
         position.users.append(user)
 
@@ -55,12 +57,12 @@ class PositionService(BaseService):
         existing_entry = await self.uow.struct_adm_position.get_by_struct_and_position(department_id, position_id)
         if existing_entry:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Position already assigned to this department")
+                                detail='Position already assigned to this department')
 
         department: StructAdmModel = await self.uow.struct_adm.get_department_with_positions(department_id)
         position = await self.uow.position.get_by_query_one_or_none(id=position_id)
 
         if department is None or position is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Department or Position not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Department or Position not found')
 
         department.positions.append(position)
